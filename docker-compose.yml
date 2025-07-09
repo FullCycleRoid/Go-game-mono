@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  # Backend
+  go-backend:
+    build:
+      context: ./go-backend
+      dockerfile: Dockerfile
+    container_name: go-backend
+    env_file:
+      - ./go-backend/.env
+    volumes:
+      - ./go-backend/src:/app/src
+    ports:
+      - "8000:8000"
+    depends_on:
+      - go-db
+      - go-redis
+    networks:
+      - go-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Frontend
+  go-frontend:
+    build:
+      context: ./go-frontend
+      dockerfile: Dockerfile
+    container_name: go-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - go-backend
+    networks:
+      - go-network
+    environment:
+      - VITE_USE_LOCAL_BACKEND=true
+      - VITE_USE_MOCK=false
+
+  # Nginx
+  go-nginx:
+    image: nginx:alpine
+    container_name: go-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - go-backend
+      - go-frontend
+    networks:
+      - go-network
+
+  # Database
+  go-db:
+    image: postgres:15
+    container_name: go-db
+    env_file: ./go-backend/.env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "25432:5432"
+    networks:
+      - go-network
+
+  # Redis
+  go-redis:
+    image: redis:7-alpine
+    container_name: go-redis
+    command: redis-server
+    env_file:
+      - ./go-backend/.env
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - go-network
+
+volumes:
+  postgres-data:
+  redis-data:
+
+networks:
+  go-network:
+    driver: bridge 
