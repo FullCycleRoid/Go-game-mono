@@ -38,8 +38,8 @@ services:
     networks:
       - go-network
     environment:
-      - VITE_USE_LOCAL_BACKEND=true
-      - VITE_USE_MOCK=false
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_TELEGRAM_BOT_TOKEN=${TELEGRAM_TOKEN}
 
   # Nginx
   go-nginx:

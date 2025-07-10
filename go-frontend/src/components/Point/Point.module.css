@@ -1,0 +1,118 @@
+:root {
+	--board-color: #c58f63;
+	--grid-color: #26221f;
+	--min-tap-target: 44px;
+}
+
+.default {
+	--horiz-line-size: 100% 1px;
+	--vert-line-size: 1px 100%;
+	--horiz-bg-pos: center center;
+	--vert-bg-pos: center center;
+	--star-point-size: 5px;
+
+	position: relative;
+	margin: 0;
+	padding: 0;
+	background-color: transparent;
+	background-repeat: no-repeat;
+	background-image: linear-gradient(var(--grid-color), var(--grid-color)), linear-gradient(var(--grid-color), var(--grid-color));
+	background-size: var(--horiz-line-size), var(--vert-line-size);
+	background-position: var(--horiz-bg-pos), var(--vert-bg-pos);
+}
+
+.btnBlackTurn {
+	display: block;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	border: 0;
+	margin: 0;
+	padding: 0;
+	background: transparent;
+	border-radius: 50%;
+	outline: 0;
+}
+
+.btnBlackTurn:enabled:focus:before, 
+.btnBlackTurn:enabled:hover:before {
+	content: '';
+	display: block;
+	position: absolute;
+	left: 3px;
+	top: 3px;
+	width: calc(100% - 6px);
+	height: calc(100% - 6px);
+	border: 1px dashed #000000;
+	border-radius: 50%;
+	outline: 0;
+}
+
+.btnWhiteTurn {
+	composes: btnBlackTurn;
+}
+
+.btnWhiteTurn:enabled:focus:before, 
+.btnWhiteTurn:enabled:hover:before {
+	border-color: #FFFFFF;
+}
+
+@media (min-width: 500px) and (min-height: 500px) {
+	.default {
+		--horiz-line-size: 100% 2px;
+		--vert-line-size: 2px 100%;
+	}
+}
+
+/* Edges */
+.top {
+	--vert-line-size: 1px 50%;
+	--vert-bg-pos: bottom center;
+}
+
+.bottom {
+	--vert-line-size: 1px 50%;
+	--vert-bg-pos: top center;
+}
+
+.left {
+	--horiz-line-size: 50% 1px;
+	--horiz-bg-pos: right center;
+}
+
+.right {
+	--horiz-line-size: 50% 1px;
+	--horiz-bg-pos: left center;
+}
+
+@media (min-width: 500px) and (min-height: 500px) {
+	.top    { --vert-line-size: 2px 50%; }
+	.bottom { --vert-line-size: 2px 50%; }
+	.left   { --horiz-line-size: 50% 2px; }
+	.right  { --horiz-line-size: 50% 2px; }
+}
+
+/* Star Points (Dots) */
+.star::before {
+	content: '';
+	display: block;
+	position: absolute;
+	background-color: var(--grid-color);
+	border-radius: 50%;
+	left: calc(50% - (var(--star-point-size) / 2));
+	top: calc(50% - (var(--star-point-size) / 2));
+	width: var(--star-point-size);
+	height: var(--star-point-size);
+}
+
+@media (min-width: 500px) and (min-height: 500px) {
+	.star::before {
+		--star-point-size: 10px;
+	}
+}
+
+@media (min-width: 850px) and (min-height: 850px) {
+	.star::before {
+		--star-point-size: 12px;
+	}
+}

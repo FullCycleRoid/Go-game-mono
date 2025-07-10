@@ -24,6 +24,7 @@
 
 - Docker и Docker Compose
 - Node.js 18+ (для разработки)
+- Telegram Bot Token
 
 ### Быстрый запуск
 
@@ -45,15 +46,36 @@ REDIS_URL=redis://go-redis:6379
 TELEGRAM_TOKEN=your_telegram_token
 ```
 
-3. Запустите проект:
+3. Установите зависимости фронтенда:
+```bash
+cd go-frontend
+npm install
+```
+
+4. Запустите проект:
 ```bash
 docker-compose up --build
 ```
 
-4. Откройте браузер:
+5. Откройте браузер:
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8000
 - Nginx: http://localhost:80
+
+### Разработка
+
+Для разработки фронтенда:
+```bash
+cd go-frontend
+npm start
+```
+
+Для разработки backend:
+```bash
+cd go-backend
+pip install -r requirements.txt
+uvicorn src.__main__:app --reload --host 0.0.0.0 --port 8000
+```
 
 ## 📁 Структура проекта
 
