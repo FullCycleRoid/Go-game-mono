@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from src import crud, schemas
-from src.database import get_db
-from src.services import go_game_service
-from src.schemas import GoGameState
+from ...src import crud, schemas
+from ...src.database import get_db
+from ...src.services import go_game_service
+from ...src.schemas import GoGameState
 
 router = APIRouter()
 

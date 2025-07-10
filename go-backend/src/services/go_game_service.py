@@ -1,5 +1,5 @@
 from typing import List, Optional, Tuple
-from src.schemas import GoGameState
+from ...src.schemas import GoGameState
 
 
 def initialize_game_state() -> GoGameState:

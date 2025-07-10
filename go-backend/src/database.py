@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from src.config import settings
+from config import settings
 
 # Формируем строку подключения
 SQLALCHEMY_DATABASE_URL = (
