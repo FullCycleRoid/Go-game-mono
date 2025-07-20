@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import JSON, Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from database import Base
+from src.database import Base
 
 
 class Player(Base):

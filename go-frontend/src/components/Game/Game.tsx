@@ -57,42 +57,31 @@ function Game() {
     setGamePhase(GamePhase.PlayingGame);
   };
 
-  // Обработка клика по точке на доске
-  const handleClickPoint: PointClickHandler = async (
-    e: MouseEvent<HTMLButtonElement>,
-    gridX: number,
-    gridY: number
-  ): Promise<void> => {
-    e.preventDefault();
-
-    if (!currentGameId || !isMyTurn || e.currentTarget.disabled) {
-      return;
-    }
-
-    try {
-      await makeMove(gridX, gridY);
-    } catch (err) {
-      console.error('Ошибка выполнения хода:', err);
-      if (telegramService.isTelegramWebApp()) {
-        telegramService.showAlert(err instanceof Error ? err.message : 'Ошибка выполнения хода');
+    // Обработка клика по точке на доске
+    const handleClickPoint = async (
+      e: MouseEvent<HTMLButtonElement>,
+      gridX: number,
+      gridY: number
+    ) => {
+      e.preventDefault();
+      if (isMyTurn) {
+        await makeMove(gridX, gridY);
       }
-    }
-  };
+    };
+      // Преобразование данных игры в формат доски
+      const getBoardData = (): StoneType[][] => {
+        if (!game?.state.board) {
+          return Array(9).fill(null).map(() => Array(9).fill(StoneType.Empty));
+        }
 
-  // Преобразование данных игры в формат доски
-  const getBoardData = (): StoneType[][] => {
-    if (!game?.state.board) {
-      return Array(9).fill(null).map(() => Array(9).fill(StoneType.Empty));
-    }
-
-    return game.state.board.map(row => 
-      row.map(cell => {
-        if (cell === 'black') return StoneType.Black;
-        if (cell === 'white') return StoneType.White;
-        return StoneType.Empty;
-      })
-    );
-  };
+        return game.state.board.map(row =>
+          row.map(cell => {
+            if (cell === 'black') return StoneType.Black;
+            if (cell === 'white') return StoneType.White;
+            return StoneType.Empty;
+          })
+        );
+      };
 
   // Получение информации об игроках
   const getPlayers = () => {
@@ -131,36 +120,23 @@ function Game() {
           return <div className={styles.loading}>Игра не найдена</div>;
         }
 
-        return (
-          <>
-            <div className={styles.gameInfo}>
-              <h2>Игра ГО</h2>
-              <p>Статус: {game.status}</p>
-              {game.state.is_game_over && (
-                <p>Победитель: {game.state.winner || 'Ничья'}</p>
-              )}
+      return (
+        <>
+          {game?.state.is_game_over && (
+            <div className={styles.gameOver}>
+              Game Over! Winner: {game.state.winner}
             </div>
-            
-            <TurnIndicator 
-              turn={getCurrentTurn()} 
-              players={getPlayers()} 
-            />
-            
-            <Board 
-              boardSize={9} 
-              boardData={getBoardData()} 
-              handleClickPoint={handleClickPoint} 
-              turn={getCurrentTurn()} 
-            />
-            
-            {isMyTurn && (
-              <div className={styles.turnIndicator}>
-                Ваш ход!
-              </div>
-            )}
-          </>
-        );
+          )}
 
+          <Board
+            boardSize={9}
+            boardData={getBoardData()}
+            turn={isMyTurn}
+            isMyTurn={isMyTurn}
+            handleClickPoint={handleClickPoint}
+          />
+        </>
+      );
       case GamePhase.CreateGame:
         return <CreateGame onGameCreated={handleGameCreated} />;
 

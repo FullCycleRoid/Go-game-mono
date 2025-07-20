@@ -54,53 +54,35 @@ export const useGame = (gameId: string | null): UseGameReturn => {
 
   // Сделать ход
   const makeMove = useCallback(async (x: number, y: number) => {
-    if (!gameId || !currentUserId || !isMyTurn()) {
-      throw new Error('Не ваш ход');
-    }
+      if (!gameId || !currentUserId) return;
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const move: MoveRequest = {
-        player_id: currentUserId,
-        x,
-        y,
-      };
-
-      const updatedGame = await gameApi.makeMove(gameId, move);
-      setGame(updatedGame);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Ошибка выполнения хода';
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [gameId, currentUserId, isMyTurn]);
-
-  // Автоматическое обновление игры каждые 5 секунд
-  useEffect(() => {
-    if (!gameId) return;
-
-    loadGame();
-
-    const interval = setInterval(() => {
-      if (!isMyTurn()) {
-        loadGame();
+      try {
+        await gameApi.makeMove(gameId, {
+          player_id: currentUserId,
+          x,
+          y
+        });
+        await loadGame();
+      } catch (err) {
+        // Обработка ошибок сервера
       }
-    }, 5000);
+    }, [gameId, currentUserId, loadGame]);
 
-    return () => clearInterval(interval);
-  }, [gameId, loadGame, isMyTurn]);
+    // Автоматическое обновление состояния
+    useEffect(() => {
+      if (!gameId) return;
 
-  return {
-    game,
-    loading,
-    error,
-    currentPlayer,
-    isMyTurn: isMyTurn(),
-    makeMove,
-    refreshGame,
-  };
+      const interval = setInterval(loadGame, 3000);
+      return () => clearInterval(interval);
+    }, [gameId, loadGame]);
+
+    return {
+      game,
+      loading,
+      error,
+      currentPlayer,
+      isMyTurn: isMyTurn(),
+      makeMove,
+      refreshGame,
+    };
 }; 

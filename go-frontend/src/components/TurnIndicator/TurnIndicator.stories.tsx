@@ -1,14 +1,15 @@
 import TurnIndicator from './TurnIndicator';
-import { newPlayer } from 'services/player';
 import { StoneType } from 'components/Stone/Stone';
 
 export default {
   component: TurnIndicator
 };
 
+const newPlayer = (playerName: string, playerColor: string) => ({ playerName, playerColor });
+
 const testPlayers = [
-  newPlayer('Player 1', StoneType.Black), 
-  newPlayer('Player 2', StoneType.White)
+  newPlayer('Player 1', 'black'), 
+  newPlayer('Player 2', 'white')
 ];
 
 export const Player1Turn = {

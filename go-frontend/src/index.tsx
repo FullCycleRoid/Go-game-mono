@@ -3,13 +3,17 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import Game from './components/Game/Game';
 import reportWebVitals from './reportWebVitals';
+import { ChainIdContext, generateChainId } from './hooks';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+const chainId = generateChainId();
 root.render(
   <React.StrictMode>
-    <Game />
+    <ChainIdContext.Provider value={chainId}>
+      <Game />
+    </ChainIdContext.Provider>
   </React.StrictMode>
 );
 

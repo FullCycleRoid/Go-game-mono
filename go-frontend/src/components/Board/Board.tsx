@@ -3,7 +3,7 @@ import styles from './Board.module.css';
 import Point, { PointClickHandler } from 'components/Point/Point';
 import BoardRow from 'components/BoardRow/BoardRow';
 import { StoneType } from 'components/Stone/Stone'
-import { getRandomInt } from 'utils/genericHelpers';
+// import { getRandomInt } from 'utils/genericHelpers';
 
 /**
  * New empty game board data. Or random board data for testing.
@@ -15,7 +15,7 @@ export const newBoardData = (boardSize:number, randomFill:boolean = false): Ston
   } else {
     return [...Array(boardSize)]
       .map(() => Array(boardSize).fill(StoneType.Empty)
-      .map(() => getRandomInt(0,2)));
+      .map(() => Math.floor(Math.random() * 2)));
   }
 };
 
@@ -23,6 +23,7 @@ export interface BoardProps {
   boardSize: number,
   boardData: StoneType[][],
   turn: boolean,
+  isMyTurn: boolean,
   handleClickPoint?: PointClickHandler
 }
 
@@ -30,7 +31,7 @@ export interface BoardProps {
  * The square game board, made up of intersecting Points.
  * The grid can be different sizes: 19x19, 13x13, and 9x9 are standard.
  */
-const Board = ({boardSize = 9, boardData, turn = false, handleClickPoint}: BoardProps) => {
+const Board = ({boardSize = 9, boardData, turn = false, isMyTurn, handleClickPoint}: BoardProps) => {
   // Rows containing all Points.
   let boardRows: JSX.Element[] = [];
 
@@ -45,6 +46,7 @@ const Board = ({boardSize = 9, boardData, turn = false, handleClickPoint}: Board
           gridX={x}
           gridY={y}
           key={y}
+          isMyTurn={isMyTurn}
           onClickPoint={handleClickPoint} 
           turn={turn}
         />

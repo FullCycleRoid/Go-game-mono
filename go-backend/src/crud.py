@@ -1,7 +1,7 @@
 import uuid
 from sqlalchemy.orm import Session
-from ..src import models, schemas
-from ..src.services.go_game_service import initialize_game_state
+from src import models, schemas
+from src.services.go_game_service import initialize_game_state
 
 
 def get_player(db: Session, telegram_id: str):

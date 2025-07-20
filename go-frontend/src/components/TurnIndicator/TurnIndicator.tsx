@@ -1,6 +1,10 @@
 import React from 'react';
 import styles from './TurnIndicator.module.css';
-import { IPlayer } from 'services/player';
+
+interface IPlayer {
+  playerName: string;
+  playerColor: string;
+}
 
 interface TurnIndicatorProps {
   turn: boolean,

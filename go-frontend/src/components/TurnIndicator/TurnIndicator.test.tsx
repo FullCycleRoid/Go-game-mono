@@ -2,15 +2,16 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import TurnIndicator from './TurnIndicator';
-import { newPlayer } from 'services/player';
 import { StoneType } from 'components/Stone/Stone';
+
+const newPlayer = (playerName: string, playerColor: string) => ({ playerName, playerColor });
 
 describe('<TurnIndicator />', () => {
   test('it should mount', () => {
 
     const testPlayers = [
-      newPlayer('Player 1', StoneType.Black), 
-      newPlayer('Player 2', StoneType.White)
+      newPlayer('Player 1', 'black'), 
+      newPlayer('Player 2', 'white')
     ];
 
     render(<TurnIndicator turn={false} players={testPlayers} />);

@@ -3,10 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.endpoints import game, player, invites
 from src.database import engine
-from src import models
+import src.models
 
 # Создаем таблицы
-models.Base.metadata.create_all(bind=engine)
+src.models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Go Game API", version="1.0.0")
 

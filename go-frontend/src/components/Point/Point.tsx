@@ -45,6 +45,7 @@ interface PointProps {
   gridX: number,
   gridY: number,
   turn: boolean,
+  isMyTurn: boolean,
   onClickPoint?: PointClickHandler
 }
 
@@ -55,22 +56,15 @@ interface PointProps {
  * The points on the edges and corners are styled to hide the parts of 
  * the grid lines that do not appear.
  */
-const Point = ({stoneType = 0, boardSize, gridX, gridY, turn, onClickPoint}: PointProps) => (
-  <li 
-    className={getPointClassNames(boardSize, gridX, gridY)} 
-    data-testid={'Point'} 
-    role="gridcell" 
-    data-x={gridX} 
-    data-y={gridY}
-  >
-    <button 
-      type="button" 
-      className={ !turn ? styles.btnBlackTurn : styles.btnWhiteTurn }
-      aria-label={`Point (${gridX + 1},${gridY + 1})`}
-      disabled={stoneType !== StoneType.Empty}
-      onClick={onClickPoint !== undefined ? (e) => onClickPoint(e, gridX, gridY) : undefined}
+const Point = ({stoneType = 0, boardSize, gridX, gridY, turn, isMyTurn, onClickPoint}: PointProps) => (
+  <li className={getPointClassNames(boardSize, gridX, gridY)}>
+    <button
+      type="button"
+      className={!turn ? styles.btnBlackTurn : styles.btnWhiteTurn}
+      disabled={!isMyTurn || stoneType !== StoneType.Empty}
+      onClick={onClickPoint ? (e) => onClickPoint(e, gridX, gridY) : undefined}
     >
-      { stoneType !== StoneType.Empty && <Stone stoneType={stoneType} /> }
+      {stoneType !== StoneType.Empty && <Stone stoneType={stoneType} />}
     </button>
   </li>
 );
