@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './Point.module.css';
 import Stone, { StoneType } from 'components/Stone/Stone';
 import { isStarPoint } from 'services/starPoints';
+import { PointProps, PointClickHandler } from './types';
 
 /**
  * Get class names for the Point's parent HTML element.
@@ -31,37 +32,16 @@ export const getPointClassNames = (boardSize: number, gridX: number, gridY: numb
 };
 
 /**
- * Handles when a grid point is clicked, i.e. when placing a stone there.
+ * Компонент точки пересечения на доске ГО.
+ * @param props PointProps
  */
-export type PointClickHandler = (
-  e: React.MouseEvent<HTMLButtonElement>,
-  gridX: number,
-  gridY: number
-) => void;
-
-interface PointProps {
-  stoneType?: number,
-  boardSize: number,
-  gridX: number,
-  gridY: number,
-  turn: boolean,
-  isMyTurn: boolean,
-  onClickPoint?: PointClickHandler
-}
-
-/**
- * Intersecting point on the board, where stones are placed.
- * 
- * The center of a Point is actually where the two grid lines intersect.
- * The points on the edges and corners are styled to hide the parts of 
- * the grid lines that do not appear.
- */
-const Point = ({stoneType = 0, boardSize, gridX, gridY, turn, isMyTurn, onClickPoint}: PointProps) => (
+const Point = ({stoneType = StoneType.Empty, boardSize, gridX, gridY, turn, isMyTurn, onClickPoint}: PointProps) => (
   <li className={getPointClassNames(boardSize, gridX, gridY)}>
     <button
       type="button"
       className={!turn ? styles.btnBlackTurn : styles.btnWhiteTurn}
       disabled={!isMyTurn || stoneType !== StoneType.Empty}
+      aria-label={`Точка (${gridX + 1}, ${gridY + 1})${isStarPoint(boardSize, gridX, gridY) ? ', звёздная' : ''}${stoneType !== StoneType.Empty ? ', занята' : ''}`}
       onClick={onClickPoint ? (e) => onClickPoint(e, gridX, gridY) : undefined}
     >
       {stoneType !== StoneType.Empty && <Stone stoneType={stoneType} />}
@@ -70,3 +50,4 @@ const Point = ({stoneType = 0, boardSize, gridX, gridY, turn, isMyTurn, onClickP
 );
 
 export default Point;
+export type { PointClickHandler } from './types';

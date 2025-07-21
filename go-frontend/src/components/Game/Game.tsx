@@ -1,189 +1,77 @@
 import React, { useState, MouseEvent, useEffect } from 'react';
 import styles from './Game.module.css';
-import Board from 'components/Board/Board';
-import TurnIndicator from 'components/TurnIndicator/TurnIndicator';
-import { StoneType } from 'components/Stone/Stone';
-import { PointClickHandler } from 'components/Point/Point';
+import { GamePhase } from '../../constants';
 import { useGame } from '../../hooks/useGame';
 import { telegramService } from '../../services/telegram';
-import CreateGame from '../CreateGame/CreateGame';
-import JoinGame from '../JoinGame/JoinGame';
+import WelcomeScreen from './WelcomeScreen';
+import CreateGameScreen from './CreateGameScreen';
+import JoinGameScreen from './JoinGameScreen';
+import PlayingGameScreen from './PlayingGameScreen';
 
-/**
- * Phases / stages of gameplay.
- */
-export enum GamePhase {
-  Welcome,
-  CreateGame,
-  JoinGame,
-  PlayingGame,
-  GameOver
-}
-
-/**
- * Main Game (App).
- */
 function Game() {
   const [gamePhase, setGamePhase] = useState<GamePhase>(GamePhase.Welcome);
   const [currentGameId, setCurrentGameId] = useState<string | null>(null);
-  
-  // Инициализация Telegram WebApp
+
   useEffect(() => {
     if (telegramService.isTelegramWebApp()) {
       telegramService.init();
     }
   }, []);
 
-  // Хук для управления игрой
   const {
     game,
     loading,
     error,
-    currentPlayer,
     isMyTurn,
     makeMove,
     refreshGame
   } = useGame(currentGameId);
 
-  // Обработка создания игры
   const handleGameCreated = (gameId: string) => {
-    console.log(gameId, "gameId gameId")
     setCurrentGameId(gameId);
     setGamePhase(GamePhase.PlayingGame);
   };
 
-  // Обработка присоединения к игре
   const handleGameJoined = (gameId: string) => {
     setCurrentGameId(gameId);
     setGamePhase(GamePhase.PlayingGame);
   };
 
-    // Обработка клика по точке на доске
-    const handleClickPoint = async (
-      e: MouseEvent<HTMLButtonElement>,
-      gridX: number,
-      gridY: number
-    ) => {
-      e.preventDefault();
-      if (isMyTurn) {
-        await makeMove(gridX, gridY);
-      }
-    };
-      // Преобразование данных игры в формат доски
-      const getBoardData = (): StoneType[][] => {
-        if (!game?.state.board) {
-          return Array(9).fill(null).map(() => Array(9).fill(StoneType.Empty));
-        }
-
-        return game.state.board.map(row =>
-          row.map(cell => {
-            if (cell === 'black') return StoneType.Black;
-            if (cell === 'white') return StoneType.White;
-            return StoneType.Empty;
-          })
-        );
-      };
-
-  // Получение информации об игроках
-  const getPlayers = () => {
-    if (!game?.players) return [];
-    return game.players.map(player => ({
-      playerName: player.player.first_name,
-      capturedStones: player.player_color === 'black' ? game.state.captured_black : game.state.captured_white
-    }));
-  };
-
-  // Определение текущего хода
-  const getCurrentTurn = (): boolean => {
-    if (!game?.state.current_player) return false;
-    return game.state.current_player === 'white';
-  };
-
-  // Рендер содержимого в зависимости от фазы игры
-  const renderGamePhase = (phase: GamePhase): React.ReactElement | null => {
-    switch (phase) {
-      case GamePhase.PlayingGame:
-        if (loading) {
-          return <div className={styles.loading}>Загрузка игры...</div>;
-        }
-
-        if (error) {
-          return (
-            <div className={styles.error}>
-              <h2>Ошибка</h2>
-              <p>{error}</p>
-              <button onClick={() => refreshGame()}>Повторить</button>
-            </div>
-          );
-        }
-
-        if (!game) {
-          return <div className={styles.loading}>Игра не найдена</div>;
-        }
-
-      return (
-        <>
-          {game?.state.is_game_over && (
-            <div className={styles.gameOver}>
-              Game Over! Winner: {game.state.winner}
-            </div>
-          )}
-
-          <Board
-            boardSize={9}
-            boardData={getBoardData()}
-            turn={isMyTurn}
-            isMyTurn={isMyTurn}
-            handleClickPoint={handleClickPoint}
-          />
-        </>
-      );
-      case GamePhase.CreateGame:
-        return <CreateGame onGameCreated={handleGameCreated} />;
-
-      case GamePhase.JoinGame:
-        return <JoinGame onGameJoined={handleGameJoined} />;
-
-      case GamePhase.Welcome:
-      default:
-        return (
-          <>
-            <header className={styles.gameIntro}>
-              <h1 className={styles.title}>
-                <small>Игра</small> ГО
-              </h1>
-              <p className={styles.subtitle}>
-                Многопользовательская онлайн игра ГО
-              </p>
-            </header>
-
-            <article className={styles.content}>
-              <div className={styles.menu}>
-                <button 
-                  type="button" 
-                  className={styles.menuButton} 
-                  onClick={() => setGamePhase(GamePhase.CreateGame)}
-                >
-                  Создать игру
-                </button>
-                
-                <button 
-                  type="button" 
-                  className={styles.menuButton} 
-                  onClick={() => setGamePhase(GamePhase.JoinGame)}
-                >
-                  Присоединиться к игре
-                </button>
-              </div>
-            </article>
-          </>
-        );
+  const handleClickPoint = async (
+    e: MouseEvent<HTMLButtonElement>,
+    gridX: number,
+    gridY: number
+  ) => {
+    e.preventDefault();
+    if (isMyTurn) {
+      await makeMove(gridX, gridY);
     }
   };
 
   return (
     <main className={styles.game} data-testid="Game">
-      {renderGamePhase(gamePhase)}
+      {gamePhase === GamePhase.Welcome && (
+        <WelcomeScreen
+          onCreate={() => setGamePhase(GamePhase.CreateGame)}
+          onJoin={() => setGamePhase(GamePhase.JoinGame)}
+        />
+      )}
+      {gamePhase === GamePhase.CreateGame && (
+        <CreateGameScreen onGameCreated={handleGameCreated} />
+      )}
+      {gamePhase === GamePhase.JoinGame && (
+        <JoinGameScreen onGameJoined={handleGameJoined} />
+      )}
+      {gamePhase === GamePhase.PlayingGame && (
+        <PlayingGameScreen
+          loading={loading}
+          error={error}
+          game={game}
+          isMyTurn={isMyTurn}
+          handleClickPoint={handleClickPoint}
+          refreshGame={refreshGame}
+        />
+      )}
     </main>
   );
 }

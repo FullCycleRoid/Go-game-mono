@@ -1,37 +1,13 @@
-import React from 'react';
 import styles from './Board.module.css';
-import Point, { PointClickHandler } from 'components/Point/Point';
+import Point from 'components/Point/Point';
 import BoardRow from 'components/BoardRow/BoardRow';
-import { StoneType } from 'components/Stone/Stone'
-// import { getRandomInt } from 'utils/genericHelpers';
+import { BoardProps } from './types';
 
 /**
- * New empty game board data. Or random board data for testing.
+ * Компонент доски ГО с поддержкой доступности.
+ * @param props BoardProps
  */
-export const newBoardData = (boardSize:number, randomFill:boolean = false): StoneType[][] => {
-  if (!randomFill){
-    return [...Array(boardSize)]
-      .map(() => Array(boardSize).fill(StoneType.Empty));
-  } else {
-    return [...Array(boardSize)]
-      .map(() => Array(boardSize).fill(StoneType.Empty)
-      .map(() => Math.floor(Math.random() * 2)));
-  }
-};
-
-export interface BoardProps {
-  boardSize: number,
-  boardData: StoneType[][],
-  turn: boolean,
-  isMyTurn: boolean,
-  handleClickPoint?: PointClickHandler
-}
-
-/**
- * The square game board, made up of intersecting Points.
- * The grid can be different sizes: 19x19, 13x13, and 9x9 are standard.
- */
-const Board = ({boardSize = 9, boardData, turn = false, isMyTurn, handleClickPoint}: BoardProps) => {
+const Board = ({boardSize = 9, boardData, isCurrentTurn = false, isMyTurn, onPointClick}: BoardProps) => {
   // Rows containing all Points.
   let boardRows: JSX.Element[] = [];
 
@@ -47,8 +23,8 @@ const Board = ({boardSize = 9, boardData, turn = false, isMyTurn, handleClickPoi
           gridY={y}
           key={y}
           isMyTurn={isMyTurn}
-          onClickPoint={handleClickPoint} 
-          turn={turn}
+          onClickPoint={onPointClick} 
+          turn={isCurrentTurn}
         />
       );
     };
@@ -65,7 +41,7 @@ const Board = ({boardSize = 9, boardData, turn = false, isMyTurn, handleClickPoi
         data-testid="Board"
         role="grid"
         aria-colcount={boardSize}
-        aria-label={`Game Board: ${boardSize} by ${boardSize}`}
+        aria-label={`Игровая доска: ${boardSize} на ${boardSize}`}
       >
         {boardRows}
       </ol>

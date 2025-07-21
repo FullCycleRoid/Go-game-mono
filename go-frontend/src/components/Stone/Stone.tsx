@@ -1,15 +1,6 @@
 import React from 'react';
 import styles from './Stone.module.css';
-
-export enum StoneType {
-  Empty = 0,
-  Black = 1,
-  White = 2
-}
-
-export interface StoneProps {
-  stoneType?: StoneType
-}
+import { StoneType, StoneProps } from './types';
 
 /**
  * The playing pieces in the game. Stones are either black or white. The component does not render anything with the Empty StoneType.
@@ -24,3 +15,4 @@ const Stone = ({stoneType = StoneType.Empty}: StoneProps) => {
 };
 
 export default Stone;
+export { StoneType };

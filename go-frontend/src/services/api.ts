@@ -1,6 +1,7 @@
 import axios from 'axios';
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+import { Player, Game, GameState, GamePlayer, MoveRequest, Invite } from './types';
+import { API_BASE_URL } from './constants';
+import { logger } from './logger';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -9,124 +10,141 @@ const api = axios.create({
   },
 });
 
-// Types
-export interface Player {
-  telegram_id: string;
-  username?: string;
-  first_name: string;
-  last_name?: string;
-  created_at: string;
-}
-
-export interface GameState {
-  board: (string | null)[][];
-  current_player: string;
-  captured_black: number;
-  captured_white: number;
-  last_move?: [number, number];
-  ko_protection?: (string | null)[][];
-  is_game_over: boolean;
-  winner?: string;
-}
-
-export interface Game {
-  id: string;
-  state: GameState;
-  status: string;
-  winner_id?: string;
-  created_at: string;
-  updated_at: string;
-  players: GamePlayer[];
-}
-
-export interface GamePlayer {
-  game_id: string;
-  player_id: string;
-  is_creator: boolean;
-  player_color: string;
-  player: Player;
-}
-
-export interface MoveRequest {
-  player_id: string;
-  x: number;
-  y: number;
-}
-
-export interface Invite {
-  id: string;
-  game_id: string;
-  player_id: string;
-  status: string;
-  created_at: string;
-  game: Game;
-  player: Player;
-}
-
-// API methods
+/**
+ * Методы для работы с играми (создание, получение, ход, присоединение)
+ */
 export const gameApi = {
-  // Создать игру
+  /**
+   * Создать игру
+   */
   createGame: async (creatorId: string): Promise<Game> => {
-    const response = await api.post('/api/games/', { creator_id: creatorId });
-    return response.data;
+    try {
+      const response = await api.post('/api/games/', { creator_id: creatorId });
+      return response.data;
+    } catch (error) {
+      logger.error('Ошибка создания игры', { error });
+      throw error;
+    }
   },
-
-  // Получить игру
+  /**
+   * Получить игру по id
+   */
   getGame: async (gameId: string): Promise<Game> => {
-    const response = await api.get(`/api/games/${gameId}`);
-    return response.data;
+    try {
+      const response = await api.get(`/api/games/${gameId}`);
+      return response.data;
+    } catch (error) {
+      logger.error('Ошибка получения игры', { error });
+      throw error;
+    }
   },
-
-  // Сделать ход
+  /**
+   * Сделать ход
+   */
   makeMove: async (gameId: string, move: MoveRequest): Promise<Game> => {
-    const response = await api.post(`/api/games/${gameId}/move`, move);
-    return response.data;
+    try {
+      const response = await api.post(`/api/games/${gameId}/move`, move);
+      return response.data;
+    } catch (error) {
+      logger.error('Ошибка хода', { error });
+      throw error;
+    }
   },
-
-  // Присоединиться к игре
+  /**
+   * Присоединиться к игре
+   */
   joinGame: async (gameId: string, playerId: string): Promise<Game> => {
-    const response = await api.post(`/api/games/${gameId}/join?player_id=${playerId}`);
-    return response.data;
+    try {
+      const response = await api.post(`/api/games/${gameId}/join?player_id=${playerId}`);
+      return response.data;
+    } catch (error) {
+      logger.error('Ошибка присоединения к игре', { error });
+      throw error;
+    }
   },
 };
 
+/**
+ * Методы для работы с игроками
+ */
 export const playerApi = {
-  // Создать игрока
+  /**
+   * Создать игрока
+   */
   createPlayer: async (player: Omit<Player, 'created_at'>): Promise<Player> => {
-    const response = await api.post('/api/players/', player);
-    return response.data;
+    try {
+      const response = await api.post('/api/players/', player);
+      return response.data;
+    } catch (error) {
+      logger.error('Ошибка создания игрока', { error });
+      throw error;
+    }
   },
-
-  // Получить игрока
+  /**
+   * Получить игрока по telegramId
+   */
   getPlayer: async (telegramId: string): Promise<Player> => {
-    const response = await api.get(`/api/players/${telegramId}`);
-    return response.data;
+    try {
+      const response = await api.get(`/api/players/${telegramId}`);
+      return response.data;
+    } catch (error) {
+      logger.error('Ошибка получения игрока', { error });
+      throw error;
+    }
   },
 };
 
+/**
+ * Методы для работы с приглашениями
+ */
 export const inviteApi = {
-  // Создать приглашение
+  /**
+   * Создать приглашение
+   */
   createInvite: async (gameId: string, playerId: string): Promise<Invite> => {
-    const response = await api.post('/api/invites/', { game_id: gameId, player_id: playerId });
-    return response.data;
+    try {
+      const response = await api.post('/api/invites/', { game_id: gameId, player_id: playerId });
+      return response.data;
+    } catch (error) {
+      logger.error('Ошибка создания приглашения', { error });
+      throw error;
+    }
   },
-
-  // Получить приглашение
+  /**
+   * Получить приглашение по id
+   */
   getInvite: async (inviteId: string): Promise<Invite> => {
-    const response = await api.get(`/api/invites/${inviteId}`);
-    return response.data;
+    try {
+      const response = await api.get(`/api/invites/${inviteId}`);
+      return response.data;
+    } catch (error) {
+      logger.error('Ошибка получения приглашения', { error });
+      throw error;
+    }
   },
-
-  // Принять приглашение
+  /**
+   * Принять приглашение
+   */
   acceptInvite: async (inviteId: string, playerId: string): Promise<Game> => {
-    const response = await api.post(`/api/invites/${inviteId}/accept?player_id=${playerId}`);
-    return response.data;
+    try {
+      const response = await api.post(`/api/invites/${inviteId}/accept?player_id=${playerId}`);
+      return response.data;
+    } catch (error) {
+      logger.error('Ошибка принятия приглашения', { error });
+      throw error;
+    }
   },
-
-  // Отклонить приглашение
+  /**
+   * Отклонить приглашение
+   */
   declineInvite: async (inviteId: string): Promise<{ message: string }> => {
-    const response = await api.post(`/api/invites/${inviteId}/decline`);
-    return response.data;
+    try {
+      const response = await api.post(`/api/invites/${inviteId}/decline`);
+      return response.data;
+    } catch (error) {
+      logger.error('Ошибка отклонения приглашения', { error });
+      throw error;
+    }
   },
 };
 

@@ -1,11 +1,6 @@
 import React from 'react';
 import styles from './BoardRow.module.css';
-
-interface BoardRowProps {
-  rowIndex: number,
-  boardSize: number,
-  children?: React.ReactNode
-}
+import { BoardRowProps } from './types';
 
 /**
  * Rows that only exist as a child of the Board component. They contain Points.
