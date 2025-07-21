@@ -47,6 +47,7 @@ function Game() {
 
   // Обработка создания игры
   const handleGameCreated = (gameId: string) => {
+    console.log(gameId, "gameId gameId")
     setCurrentGameId(gameId);
     setGamePhase(GamePhase.PlayingGame);
   };

@@ -130,4 +130,4 @@ export const inviteApi = {
   },
 };
 
-export default api; 
+export default api;
